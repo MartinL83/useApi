@@ -33,7 +33,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "useapi",
+  "name": "useApi",
   "author": "Martin Lindgren",
   "module": "dist/useapi.esm.js",
   "size-limit": [
