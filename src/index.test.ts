@@ -81,4 +81,57 @@ describe('Test client', () => {
       expect(fetch.mock.calls[0][0]).toEqual('https://api.tld/posts/1/text');
     });
   });
+
+  describe('Handle response', () => {
+    it('should return response', async () => {
+      fetch.mockResponseOnce(JSON.stringify({ data: 'data' }), {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const api = new Client({
+        uri: 'https://api.tld',
+      });
+
+      api.addEndpoint({
+        name: 'posts',
+        path: '/posts/:id',
+      });
+
+      const { response, error } = await api.request('posts', {
+        params: {
+          id: 1,
+        },
+      });
+
+      expect(response).toStrictEqual({ data: 'data' });
+      expect(error).toBeUndefined();
+    });
+  });
+
+  describe('Handle error', () => {
+    it('should return error', async () => {
+      fetch.mockReject(new Error());
+
+      const api = new Client({
+        uri: 'https://api.tld',
+      });
+
+      api.addEndpoint({
+        name: 'posts',
+        path: '/posts/:id/:p',
+      });
+
+      const { response, error } = await api.request('posts', {
+        params: {
+          id: 1,
+          p: 'text',
+        },
+      });
+
+      expect(response).toBe(undefined);
+      expect(error).toBeDefined();
+    });
+  });
 });

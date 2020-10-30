@@ -43,8 +43,16 @@ class Client {
   }
 
   addEndpoint(config: EndpointOptions) {
-    const { name, ...endpoint } = config;
-    this.endpoints[name] = endpoint;
+    const { name, path, ...endpoint } = config;
+
+    const pathname = path ? new PathRegExp(path) : '';
+
+    const data = {
+      ...endpoint,
+      pathname,
+    };
+
+    this.endpoints[name] = data;
 
     return name;
   }
@@ -73,7 +81,7 @@ class Client {
     // TODO: Query params
 
     try {
-      const path = createUrl(new PathRegExp(endpoint.path), params);
+      const path = createUrl(endpoint.pathname, params);
       url = `${this.uri}${path}`;
     } catch (error) {
       url = this.uri;
@@ -91,8 +99,8 @@ class Client {
     return fetch(url, requestParams)
       .then(checkNetworkStatus)
       .then(handleResponse)
-      .catch(returnError)
-      .then(returnResponse);
+      .then(returnResponse)
+      .catch(returnError);
   }
 }
 
