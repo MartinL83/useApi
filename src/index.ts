@@ -22,14 +22,24 @@ interface EndpointOptions {
 
 interface RequestOptions {
   params?: Record<string, string | number>;
-  headers?: object | {};
   body?: object;
+  headers?: object | {};
 }
 
 interface RequestResponse {
   response: any;
   error: any;
 }
+
+/**
+ *
+ * @param url URL to call
+ * @param options Request options to pass to http client.
+ */
+const httpClient = (url: string, options: RequestInit) =>
+  fetch(url, options)
+    .then(checkNetworkStatus)
+    .then(handleResponse);
 
 class Client {
   uri: string;
@@ -65,10 +75,6 @@ class Client {
     return this.endpoints;
   }
 
-  setHeaders(key: string, value: string) {
-    this.headers[key] = value;
-  }
-
   async request(
     name: string,
     options?: RequestOptions
@@ -96,9 +102,7 @@ class Client {
       },
     };
 
-    return fetch(url, requestParams)
-      .then(checkNetworkStatus)
-      .then(handleResponse)
+    return httpClient(url, requestParams)
       .then(returnResponse)
       .catch(returnError);
   }
